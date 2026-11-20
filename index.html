@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Storm Engine: A Weather, Climate & Hurricane WebQuest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF4F7; --card:#FFFFFF; --ink:#14232E; --muted:#4D5E6A; --line:#C6D4DC;
+  --ocean:#0D5C7D; --ocean-soft:#D6E9F2; --sun:#E9A100; --sun-soft:#FFF1CC;
+  --storm:#B3245C; --storm-soft:#FBE3EC; --ok:#1C7448; --ok-soft:#DDF2E6; --land:#C9B48A;
+  --display:"Bricolage Grotesque", "Trebuchet MS", "Segoe UI", sans-serif;
+  --body:"Atkinson Hyperlegible", Verdana, "Segoe UI", sans-serif;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1B24; --card:#16252F; --ink:#E5EEF2; --muted:#A3B3BE; --line:#2B3D49;
+    --ocean:#62B9DE; --ocean-soft:#16364A; --sun:#F5BC2E; --sun-soft:#3A3014;
+    --storm:#F06A9A; --storm-soft:#3D1A28; --ok:#63C893; --ok-soft:#173527; --land:#8C7A55;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1B24; --card:#16252F; --ink:#E5EEF2; --muted:#A3B3BE; --line:#2B3D49;
+  --ocean:#62B9DE; --ocean-soft:#16364A; --sun:#F5BC2E; --sun-soft:#3A3014;
+  --storm:#F06A9A; --storm-soft:#3D1A28; --ok:#63C893; --ok-soft:#173527; --land:#8C7A55;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:1.0625rem;line-height:1.6}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);line-height:1.15;margin:0}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap;padding:1.25rem clamp(1rem,4vw,2.5rem) .25rem;max-width:1100px;margin:0 auto}
+.top h1{font-size:clamp(2rem,5vw,3.1rem);font-weight:800;letter-spacing:-.02em;color:var(--ocean)}
+.top p{margin:.15rem 0 0;color:var(--muted)}
+#who{color:var(--muted);font-size:.95rem;text-align:right}
+#who strong{color:var(--ink)}
+/* Track navigation */
+.trackwrap{max-width:1100px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+#track{position:relative;width:100%;aspect-ratio:1000/150;min-height:96px}
+#track svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.node{position:absolute;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;border:2px solid var(--ocean);background:var(--card);color:var(--ocean);font-weight:700;cursor:pointer;display:grid;place-items:center;padding:0;font-size:.95rem}
+.node.done{background:var(--ocean);color:var(--card)}
+.node.here{border-color:var(--storm);box-shadow:0 0 0 4px var(--storm-soft)}
+.node:disabled{border-color:var(--line);color:var(--line);cursor:not-allowed;background:var(--paper)}
+.node .tip{position:absolute;top:44px;white-space:nowrap;font-size:.75rem;color:var(--muted);font-weight:400;pointer-events:none}
+.node.here .tip{color:var(--ink);font-weight:700}
+@media (max-width:640px){.node{width:30px;height:30px;font-size:.8rem}.node .tip{display:none}.node.here .tip{display:block;top:36px}}
+/* Main */
+main{max-width:1100px;margin:0 auto;padding:1rem clamp(1rem,4vw,2.5rem) 4rem}
+article{max-width:780px}
+.meta{color:var(--muted);margin:0 0 .25rem;font-size:.95rem}
+article>h2{font-size:clamp(1.7rem,4vw,2.4rem);font-weight:800;margin-bottom:.5rem}
+.mission{font-size:1.15rem;border-left:5px solid var(--sun);padding:.25rem 0 .25rem 1rem;margin:1rem 0 1.5rem}
+.read p{margin:.75rem 0}
+.read h3,.lab h3,.checks h3,.note h3{font-size:1.3rem;margin:2rem 0 .5rem}
+dfn{font-style:normal;font-weight:700;color:var(--ocean)}
+.callout{background:var(--sun-soft);border-radius:6px;padding:.9rem 1.1rem;margin:1.25rem 0}
+.callout strong{display:block;font-family:var(--display);font-size:1.05rem}
+.lab{background:var(--card);border:2px solid var(--ocean);border-radius:14px;padding:1rem 1.25rem 1.25rem;margin:2rem 0}
+.lab h3{margin-top:.25rem;color:var(--ocean)}
+.figure{width:100%;max-width:520px;display:block;margin:.75rem 0;background:var(--ocean-soft);border-radius:8px}
+.controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:.75rem 0}
+.btn{border:2px solid var(--ocean);background:var(--card);color:var(--ocean);border-radius:999px;padding:.45rem 1.1rem;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--ocean-soft)}
+.btn.primary{background:var(--ocean);color:var(--card)}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn[aria-pressed="true"]{background:var(--ocean);color:var(--card)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+input[type=range]{width:100%;max-width:420px;accent-color:var(--ocean)}
+label.slider{display:block;margin:.6rem 0}
+label.slider output{font-weight:700}
+.meterbar{height:16px;border-radius:8px;background:var(--paper);border:1px solid var(--line);overflow:hidden;max-width:420px}
+.meterbar span{display:block;height:100%;background:var(--sun);transition:width .2s}
+/* Questions */
+fieldset.q{border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem 1rem;margin:1rem 0;background:var(--card)}
+fieldset.q legend{font-weight:700;padding:0 .35rem}
+.opts{display:grid;gap:.45rem;margin-top:.5rem}
+.opt{text-align:left;border:2px solid var(--line);background:var(--card);border-radius:8px;padding:.5rem .8rem;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--ocean)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--storm);background:var(--storm-soft);text-decoration:line-through}
+.opt:disabled{cursor:default}
+.fb{margin:.6rem 0 0;font-size:.97rem}
+.fb.ok{color:var(--ok)} .fb.no{color:var(--storm)}
+textarea{width:100%;min-height:120px;border:2px solid var(--line);border-radius:8px;padding:.7rem;background:var(--card);resize:vertical}
+textarea:focus{border-color:var(--ocean)}
+.note label{display:block;margin-bottom:.4rem}
+.count{font-size:.85rem;color:var(--muted)}
+.next{margin-top:2rem;display:flex;flex-wrap:wrap;gap:1rem;align-items:center}
+.next p{margin:0;color:var(--storm)}
+/* Sort */
+.sortgrid{display:grid;gap:.6rem}
+.card{border:1px solid var(--line);border-radius:8px;padding:.6rem .8rem;background:var(--paper);display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:space-between}
+.card .txt{flex:1 1 260px}
+.card.good{border-color:var(--ok);background:var(--ok-soft)}
+.tag{font-weight:700;font-size:.9rem}
+/* Coriolis */
+.cor{display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-start}
+.cor canvas{width:100%;max-width:320px;aspect-ratio:1;background:var(--ocean-soft);border-radius:12px}
+.cor .side{flex:1 1 240px}
+/* Belts */
+.belts select{padding:.35rem;border-radius:6px;border:2px solid var(--line);background:var(--card);max-width:100%}
+.belts .row{margin:.55rem 0;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.belts .row span.l{min-width:15rem;font-weight:700}
+.mark{font-weight:700}
+/* Hurricane builder */
+.ingredients li{margin:.25rem 0}
+.spin{transform-origin:100px 100px;animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(-360deg)}}
+.flow{stroke-dasharray:10 8;animation:flow 1.2s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-36}}
+@media (prefers-reduced-motion: reduce){.spin,.flow{animation:none}}
+/* Game */
+.gamebox{background:var(--card);border:2px solid var(--storm);border-radius:14px;padding:1rem;margin:1.5rem 0}
+.hud{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem;margin-bottom:.6rem}
+.hud div{background:var(--paper);border-radius:8px;padding:.35rem .6rem}
+.hud small{display:block;color:var(--muted);font-size:.8rem}
+.hud b{font-family:var(--display);font-size:1.25rem}
+#gcanvas{width:100%;aspect-ratio:16/9;border-radius:8px;display:block;background:#0a3a52;touch-action:none}
+#status{min-height:1.6em;font-weight:700;margin:.5rem 0}
+.pad{display:flex;gap:.6rem;margin-top:.5rem}
+.pad .btn{flex:1;padding:.8rem;font-size:1.1rem}
+.panel{border-top:1px dashed var(--line);margin-top:1rem;padding-top:1rem}
+.results{width:100%;border-collapse:collapse;margin:.5rem 0}
+.results td,.results th{border-bottom:1px solid var(--line);padding:.35rem .4rem;text-align:left}
+.tablewrap{overflow-x:auto}
+/* Report */
+.report{background:var(--card);border:2px solid var(--ok);border-radius:14px;padding:1.25rem;margin:1.5rem 0}
+.report pre{white-space:pre-wrap;font-family:var(--body);font-size:.95rem;background:var(--paper);padding:1rem;border-radius:8px;max-height:420px;overflow:auto}
+.score{font-family:var(--display);font-size:2.4rem;font-weight:800;color:var(--ok);margin:0}
+.brief-grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:1.5rem 0}
+.brief-grid div{background:var(--card);border-radius:10px;padding:1rem;border:1px solid var(--line)}
+.brief-grid h3{font-size:1.1rem;margin-bottom:.3rem}
+.field{display:block;margin:.8rem 0}
+.field input{display:block;margin-top:.3rem;padding:.55rem .7rem;border:2px solid var(--line);border-radius:8px;width:100%;max-width:360px;background:var(--card)}
+.hero-svg{width:100%;max-width:780px;display:block;margin:.5rem 0 1rem}
+.small{font-size:.9rem;color:var(--muted)}
+.inline-confirm{display:none;gap:.5rem;align-items:center;flex-wrap:wrap}
+.inline-confirm.show{display:flex}
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Storm Engine</h1>
+    <p>How the Sun, oceans, and air team up to make weather, climate, and hurricanes (TEKS 8.10A, 8.10B, 8.10C)</p>
+  </div>
+  <div id="who"></div>
+</header>
+<div class="trackwrap"><nav id="track" aria-label="Quest stations"></nav></div>
+<main id="view"></main>
+
+<script>
+/* ---------- Saving ---------- */
+const dlReady = (window.claude && typeof window.claude.use === 'function') ? window.claude.use('downloads').catch(() => null) : Promise.resolve(null);
+const KEY = 'stormEngineQuest.v1';
+function fresh(){ return {name:'',period:'',current:'brief',done:{},q:{},notes:{},sort:{},sortFirst:null,belts:null,game:{rounds:{},boost:0,done:false},gameNote:'',final:{ans:{},submitted:false},cer:''}; }
+function load(){ try{ const r = localStorage.getItem(KEY); if(r){ const d = JSON.parse(r); const f = fresh(); return Object.assign(f, d, {game:Object.assign(f.game, d.game||{}), final:Object.assign(f.final, d.final||{})}); } }catch(e){} return fresh(); }
+let S = load();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- Stations ---------- */
+const ORDER = ['brief','s1','s2','s3','s4','s5','game','final'];
+const LABELS = {brief:'Briefing',s1:'Sun',s2:'Water & air',s3:'Weather or climate',s4:'Global winds',s5:'Hurricanes',game:'Storm Steer game',final:'Final challenge'};
+
+const STATIONS = {
+s1:{ n:1, teks:'8.10A', time:'15 minutes', title:'The Sun’s uneven heat',
+ mission:'Figure out why some parts of Earth get more energy from the Sun than others, and why that difference gets the whole atmosphere moving.',
+ read:`
+ <p>Almost all the energy that drives weather starts in one place: the <dfn>Sun</dfn>. Sunlight travels to Earth, warms the land and the oceans, and the warm surface then heats the air above it.</p>
+ <p>But Earth is a ball, not a flat plate. Near the <dfn>equator</dfn>, sunlight hits the ground almost straight on, so its energy is packed into a small area. Near the <dfn>poles</dfn>, sunlight hits at a low slant, so the same beam of energy gets spread across a much bigger area. Each square meter gets less.</p>
+ <p>The result is <dfn>uneven heating</dfn>: the tropics stay hot and the poles stay cold. Earth’s air and water are always trying to even out that difference. Warm air and water move toward the poles, and cold air and water move toward the equator. That constant movement is what we feel as wind and see as weather.</p>
+ <div class="callout"><strong>Keep in mind</strong>Earth’s tilt changes the Sun’s angle through the year. That’s why Texas summers (Sun high in the sky) are so much hotter than Texas winters (Sun lower).</div>`,
+ lab:'sun',
+ questions:[
+  {q:'Why does the equator get more solar energy per square meter than the poles?', o:['The equator is much closer to the Sun','Sunlight strikes the equator more directly, so energy is packed into a smaller area','The equator has more clouds that trap sunlight','The poles reflect all sunlight back into space'], a:1, why:'The distance to the Sun is almost the same. What changes is the angle: direct rays concentrate energy, slanted rays spread it out.'},
+  {q:'In the Sun angle lab, set the Sun to 30°. Compared to 90°, each square meter of ground gets about…', o:['Twice as much energy','The same energy','Half as much energy','No energy at all'], a:2, why:'At 30° the beam spreads over about twice the area, so each square meter gets about 50% of the energy.'},
+  {q:'What does uneven heating of Earth’s surface cause?', o:['Air and water to move, creating wind and weather','Earth to rotate','The Moon’s phases','Earthquakes'], a:0, why:'Differences in temperature create differences in air pressure, and air moves from high pressure to low pressure. That moving air is wind.'}
+ ],
+ note:'In your own words, explain why the North Pole stays cold even though it gets sunlight in summer.'},
+
+s2:{ n:2, teks:'8.10A', time:'15 minutes', title:'Water, air, and the heat handoff',
+ mission:'Discover how the hydrosphere (Earth’s water) and the atmosphere (Earth’s air) pass the Sun’s energy back and forth.',
+ read:`
+ <p>The <dfn>hydrosphere</dfn> is all of Earth’s water: oceans, lakes, rivers, ice, and water vapor. The <dfn>atmosphere</dfn> is the layer of air around Earth. Together they move the Sun’s energy around the planet.</p>
+ <p>Water heats up and cools down much more slowly than land. Scientists say water has a high <dfn>specific heat</dfn>. That’s why a beach’s sand burns your feet at noon while the water still feels cool, and why oceans stay warm long after summer ends. Oceans store huge amounts of heat and carry it with <dfn>ocean currents</dfn>.</p>
+ <p>The Sun’s energy also causes <dfn>evaporation</dfn>, turning liquid water into water vapor. That vapor holds hidden energy. When the vapor rises, cools, and <dfn>condenses</dfn> into cloud droplets, it releases that energy as heat into the air. This released heat is called <dfn>latent heat</dfn>, and it is the fuel that powers thunderstorms and hurricanes.</p>
+ <p>You can see land and water working together at the coast. During the day, land heats faster, warm air rises over it, and cooler air from the sea rushes in to take its place: a <dfn>sea breeze</dfn>. At night, land cools faster, and the pattern flips into a <dfn>land breeze</dfn>.</p>
+ <div class="callout"><strong>Texas connection</strong>Coastal cities like Corpus Christi and Galveston often get a cooling afternoon sea breeze in summer, and their temperatures swing less from day to night than inland cities.</div>`,
+ lab:'breeze',
+ questions:[
+  {q:'On a sunny afternoon at a Texas beach, which way does the wind usually blow near the ground?', o:['From the land toward the sea','From the sea toward the land','Straight down from the sky','There is no wind during the day'], a:1, why:'The land heats faster, air rises over it, and cooler air from over the water flows in. That’s a sea breeze.'},
+  {q:'Why do coastal cities usually have milder temperatures than inland cities at the same latitude?', o:['Water heats and cools slowly, so it keeps nearby air from getting extremely hot or cold','Coastal cities are closer to the Sun','Salt in the air blocks sunlight','Inland cities have more people'], a:0, why:'Because of water’s high specific heat, large bodies of water moderate (even out) temperatures nearby.'},
+  {q:'What happens when water vapor condenses into cloud droplets?', o:['It absorbs heat and cools the air','It releases heat energy into the atmosphere','It turns into ice immediately','Nothing happens to energy'], a:1, why:'Condensation releases latent heat. This is the energy that powers storms.'},
+  {q:'Which of these is part of the hydrosphere?', o:['A sea breeze','Sunlight','An ocean current','Air pressure'], a:2, why:'Ocean currents are moving water, so they are part of the hydrosphere. The others belong to the atmosphere or come from the Sun.'}
+ ],
+ note:'Explain how a sea breeze forms. Use the words land, water, heats, and rises.'},
+
+s3:{ n:3, teks:'8.10A', time:'15 minutes', title:'Weather or climate?',
+ mission:'Learn to tell the difference between short-term weather and long-term climate, then sort real examples.',
+ read:`
+ <p><dfn>Weather</dfn> is what the atmosphere is doing in one place over a short time: hours or days. It includes temperature, humidity, precipitation (rain, sleet, snow, hail), wind, air pressure, and clouds. Weather can change in minutes when a front moves through.</p>
+ <p><dfn>Climate</dfn> is the long-term pattern of weather in a region, usually averaged over 30 years or more. Climate tells you what to <em>expect</em>; weather tells you what you actually <em>get</em> today.</p>
+ <p>A region’s climate depends on several factors: its <dfn>latitude</dfn> (how much direct sunlight it gets), how close it is to <dfn>large bodies of water</dfn>, its <dfn>elevation</dfn>, nearby <dfn>ocean currents</dfn>, and the <dfn>prevailing winds</dfn> that bring in moist or dry air.</p>
+ <div class="callout"><strong>Texas connection</strong>Texas has more than one climate. Houston, near warm ocean water, is humid and rainy. El Paso, far inland and higher in elevation, has a dry desert climate. Same state, very different climates.</div>`,
+ lab:'sort',
+ questions:[
+  {q:'Which statement describes climate?', o:['It is raining in Dallas right now','Houston averages about 50 inches of rain per year','A cold front will arrive tonight','Winds are gusting to 30 mph this afternoon'], a:1, why:'An average over many years is climate. The others describe conditions at one moment, which is weather.'},
+  {q:'One January day in Dallas is the coldest in ten years. Does that single day tell you the climate has changed?', o:['Yes, one record day changes the climate','No, one day is weather; climate is based on decades of data','Yes, if the day is below freezing','No, because Dallas has no climate'], a:1, why:'Climate is a long-term average. A single day, even an extreme one, is weather.'},
+  {q:'Why is Houston’s climate more humid than El Paso’s?', o:['Houston is closer to a large body of warm ocean water that supplies moisture','Houston gets less sunlight','El Paso is closer to the equator','Houston has more mountains'], a:0, why:'Nearness to water is a major climate factor. Evaporation from warm ocean water puts moisture into the air that blows inland.'}
+ ],
+ note:'Describe today’s weather where you are. Then describe the climate of your part of Texas. How are your two answers different?'},
+
+s4:{ n:4, teks:'8.10B', time:'20 minutes', title:'Global winds and the Coriolis effect',
+ mission:'Map the giant wind belts that circle the planet and find out why Earth’s spin bends every wind and storm.',
+ read:`
+ <p>Remember uneven heating? At the equator, hot air <dfn>rises</dfn>, creating low pressure and lots of rain. High in the atmosphere, that air spreads toward the poles, cools, and <dfn>sinks</dfn> around 30° latitude, creating high pressure and dry air. Many of the world’s deserts sit near 30° for this reason. Then the air flows back toward the equator along the ground, completing a loop.</p>
+ <p>These loops are called <dfn>convection cells</dfn>. Each hemisphere has three: the <dfn>Hadley cell</dfn> (0°–30°), the <dfn>Ferrel cell</dfn> (30°–60°), and the <dfn>Polar cell</dfn> (60°–90°). The surface winds they create are called <dfn>global winds</dfn>.</p>
+ <p>If Earth didn’t spin, those winds would blow straight north or south. But Earth rotates, and the ground moves underneath the moving air. This makes winds, ocean currents, and storms appear to curve. That curving is the <dfn>Coriolis effect</dfn>. In the Northern Hemisphere, moving air curves to the <strong>right</strong>. In the Southern Hemisphere, it curves to the <strong>left</strong>. The effect is strongest near the poles and almost zero at the equator.</p>
+ <p>Thanks to the Coriolis effect, the global winds blow at an angle: the <dfn>trade winds</dfn> blow from the east toward the equator (0°–30°), the <dfn>prevailing westerlies</dfn> blow from the west (30°–60°), and the <dfn>polar easterlies</dfn> blow from the east near the poles.</p>
+ <div class="callout"><strong>Texas connection</strong>Texas sits in the zone where trade winds and westerlies meet. Most storm systems cross the United States from west to east, carried by the westerlies. Hurricanes in the tropics are pushed west by the trade winds, then often curve north as they reach the westerlies.</div>`,
+ lab:'coriolis',
+ questions:[
+  {q:'In the Northern Hemisphere, the Coriolis effect makes moving air curve to the…', o:['Left','Right','Straight up','It doesn’t curve'], a:1, why:'Northern Hemisphere winds and currents deflect to the right. Southern Hemisphere ones deflect to the left.'},
+  {q:'Most weather systems move across the United States from west to east because of the…', o:['Trade winds','Polar easterlies','Prevailing westerlies','Sea breeze'], a:2, why:'The United States sits mostly between 30° and 50° north, inside the belt of prevailing westerlies.'},
+  {q:'Air sinks around 30° latitude, creating high pressure and dry conditions. This helps explain why many of the world’s ____ are found near 30°.', o:['rainforests','deserts','glaciers','volcanoes'], a:1, why:'Sinking air warms and dries out, so clouds and rain are rare. The Sahara and the Chihuahuan Desert are near 30°.'},
+  {q:'Where is the Coriolis effect weakest?', o:['At the North Pole','At 45° latitude','At the equator','At the South Pole'], a:2, why:'The effect is near zero at the equator. That matters for hurricanes, as you’ll see next.'}
+ ],
+ note:'A storm forms over West Texas. Is it more likely to move toward Louisiana or toward New Mexico? Explain using a global wind belt.'},
+
+s5:{ n:5, teks:'8.10C', time:'20 minutes', title:'The recipe for a hurricane',
+ mission:'Identify the ingredients a tropical cyclone needs, follow how it grows, and explain why it dies.',
+ read:`
+ <p>A <dfn>tropical cyclone</dfn> is a huge, rotating, low-pressure storm that forms over warm tropical oceans. In the Atlantic and eastern Pacific it’s called a <dfn>hurricane</dfn>. In the western Pacific it’s a <dfn>typhoon</dfn>, and in the Indian Ocean it’s a <dfn>cyclone</dfn>. Same storm, different names.</p>
+ <h3>The five ingredients</h3>
+ <ul class="ingredients">
+  <li><strong>Warm ocean water</strong>, at least about 26.5 °C (80 °F), deep enough to keep supplying heat.</li>
+  <li><strong>Warm, moist air</strong> from evaporation, which carries energy upward.</li>
+  <li><strong>Low wind shear</strong>: the wind speed and direction are similar from the bottom to the top of the storm, so it can stand up tall without being torn apart.</li>
+  <li><strong>Enough Coriolis effect</strong> to start spinning, which means forming at least about 5° away from the equator.</li>
+  <li><strong>A starting disturbance</strong>, like a cluster of thunderstorms. Many Atlantic hurricanes begin as tropical waves rolling off the coast of Africa.</li>
+ </ul>
+ <h3>How the engine runs</h3>
+ <p>Warm, moist air rises from the ocean. As it rises it cools and condenses into towering clouds, releasing latent heat. That heat warms the storm’s core, which lowers the air pressure at the surface. Lower pressure pulls in more warm, moist air from the ocean… and the cycle feeds itself. Thanks to the Coriolis effect, the incoming air spins <strong>counterclockwise</strong> in the Northern Hemisphere.</p>
+ <p>Storms grow in stages: <dfn>tropical disturbance</dfn> → <dfn>tropical depression</dfn> (winds under 39 mph) → <dfn>tropical storm</dfn> (39–73 mph, gets a name) → <dfn>hurricane</dfn> (74 mph or more). Hurricanes are rated Category 1–5 on the <dfn>Saffir-Simpson scale</dfn>; Category 3 and above (111 mph or more) are major hurricanes.</p>
+ <p>A mature hurricane has a calm <dfn>eye</dfn> in the center, a ring of violent winds called the <dfn>eyewall</dfn>, and spiraling <dfn>rain bands</dfn>. When a hurricane moves over land or cold water, it loses its fuel supply and weakens. But it can still bring deadly <dfn>storm surge</dfn>, flooding rain, and tornadoes.</p>
+ <div class="callout"><strong>Texas connection</strong>In 2017, Hurricane Harvey made landfall as a Category 4 hurricane near Rockport, then stalled over southeast Texas for days. Moisture kept streaming in from warm ocean water, and some places got more than 60 inches of rain. Atlantic hurricane season runs June 1 to November 30.</div>`,
+ lab:'builder',
+ questions:[
+  {q:'Why do hurricanes weaken after they move over land?', o:['Land is closer to the Sun','They are cut off from the warm ocean water and moisture that fuel them','The Coriolis effect stops on land','Mountains reflect the wind back'], a:1, why:'No warm water means no evaporation and no latent heat. The engine runs out of fuel.'},
+  {q:'Hurricanes almost never form within about 5° of the equator. Why?', o:['The water there is too cold','There is no sunlight there','The Coriolis effect is too weak to start the storm spinning','The trade winds stop there'], a:2, why:'Without enough Coriolis effect, incoming air flows straight into the low instead of spinning around it.'},
+  {q:'What is the main energy source that powers a hurricane?', o:['Lightning inside the storm','Heat released when water vapor from the warm ocean condenses','Heat from inside Earth','Energy from the Moon’s tides'], a:1, why:'The Sun warms the ocean, water evaporates, and the vapor releases latent heat when it condenses in the storm’s clouds.'},
+  {q:'A storm has sustained winds of 85 mph. What is it?', o:['A tropical depression','A tropical storm','A Category 1 hurricane','A Category 3 major hurricane'], a:2, why:'74–95 mph is Category 1. Major hurricanes start at 111 mph.'}
+ ],
+ note:'Pick one hurricane ingredient. Explain what would happen to a growing storm if that ingredient were suddenly taken away.'}
+};
+
+const SORT_ITEMS = [
+ {t:'Thunderstorms are expected in Austin this afternoon.', a:'weather'},
+ {t:'Houston averages about 50 inches of rain a year.', a:'climate'},
+ {t:'It’s 41 °F with a strong north wind this morning.', a:'weather'},
+ {t:'El Paso has a dry desert pattern year after year.', a:'climate'},
+ {t:'A cold front will pass through Amarillo tonight.', a:'weather'},
+ {t:'Texas summers are typically long and hot.', a:'climate'},
+ {t:'The humidity is 90% right now.', a:'weather'},
+ {t:'Snow is rare along the Texas Gulf coast.', a:'climate'},
+ {t:'Tomorrow there’s a 70% chance of rain.', a:'weather'},
+ {t:'Over the last 30 years, a city’s average yearly temperature rose 1 °F.', a:'climate'}
+];
+
+const FINAL_QS = [
+ {q:'What is the main source of energy that drives Earth’s weather?', o:['Heat from Earth’s core','The Sun','The Moon','Ocean tides'], a:1},
+ {q:'Which pair correctly matches the term to its meaning?', o:['Weather: 30-year average; climate: today’s conditions','Weather: short-term conditions; climate: long-term pattern','Weather and climate mean the same thing','Climate only describes temperature'], a:1},
+ {q:'A coastal city and an inland city are at the same latitude. Which most likely has the smaller difference between summer and winter temperatures?', o:['The inland city, because it is far from water','The coastal city, because water heats and cools slowly','Both are always the same','Neither has seasons'], a:1},
+ {q:'What happens to air at the equator?', o:['It sinks, creating high pressure and dry weather','It rises, creating low pressure and rain','It stays perfectly still','It freezes'], a:1},
+ {q:'The trade winds blow…', o:['From the east toward the equator, between 0° and 30°','From the west, between 30° and 60°','Only over land','Straight north'], a:0},
+ {q:'The Coriolis effect is caused by…', o:['The Moon’s gravity','Earth’s rotation','Ocean salt','Volcanoes'], a:1},
+ {q:'Which way do hurricanes spin in the Northern Hemisphere?', o:['Clockwise','Counterclockwise','They don’t spin','It changes every day'], a:1},
+ {q:'Which of these is NOT an ingredient for a hurricane?', o:['Warm ocean water of at least 26.5 °C','Low wind shear','Cold, dry air','A starting cluster of thunderstorms'], a:2},
+ {q:'A hurricane moves over ocean water that is 22 °C (72 °F). What will most likely happen?', o:['It strengthens quickly','It weakens because the water is too cool to fuel it','It turns into a tornado','It spins the other direction'], a:1},
+ {q:'Which shows the correct order of a tropical cyclone’s growth?', o:['Hurricane → tropical storm → tropical depression','Tropical storm → tropical depression → hurricane','Tropical depression → tropical storm → hurricane','Tropical depression → hurricane → tropical storm'], a:2}
+];
+
+const GAME_CHECKS = [
+ {q:'Your storm is over 29 °C water with low wind shear. What should happen?', o:['It strengthens','It weakens','It disappears'], a:0},
+ {q:'Strong wind shear ahead! What does shear do to a hurricane?', o:['Tilts and tears the storm apart, weakening it','Adds warm water','Makes the eye bigger and stronger'], a:0},
+ {q:'Why does the storm drift north as it travels west?', o:['The Coriolis effect and global winds steer it poleward','Cold air pulls it','Islands push it'], a:0},
+ {q:'Your storm drifts down to 3° latitude. What’s the problem?', o:['The Coriolis effect is too weak to keep it spinning','The water is too warm','The trade winds disappear'], a:0}
+];
+
+/* ---------- Helpers ---------- */
+function unlocked(id){ const i = ORDER.indexOf(id); if(i<=0) return true; return !!S.done[ORDER[i-1]]; }
+function go(id){ if(!unlocked(id)) return; S.current = id; save(); render(); window.scrollTo({top:0, behavior:'smooth'}); }
+
+function renderWho(){
+  $('who').innerHTML = S.name ? `Forecaster <strong>${esc(S.name)}</strong>${S.period?`, period ${esc(S.period)}`:''}<br><span class="small">Your work saves on this Chromebook account</span>` : '';
+}
+
+function renderTrack(){
+  const nav = $('track');
+  const d = 'M 40 120 C 180 128, 300 118, 420 96 S 640 40, 760 34 S 900 44, 960 64';
+  nav.innerHTML = `<svg viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true"><path id="tpath" d="${d}" fill="none" stroke="var(--line)" stroke-width="4" stroke-dasharray="2 10" stroke-linecap="round"/></svg>`;
+  const p = $('tpath'); const L = p.getTotalLength();
+  ORDER.forEach((id, i) => {
+    const pt = p.getPointAtLength(L * i / (ORDER.length - 1));
+    const b = document.createElement('button');
+    b.className = 'node' + (S.done[id] ? ' done' : '') + (S.current === id ? ' here' : '');
+    b.style.left = (pt.x / 10) + '%'; b.style.top = (pt.y / 1.5) + '%';
+    b.disabled = !unlocked(id);
+    const sym = id === 'brief' ? '★' : id === 'game' ? '🌀' : id === 'final' ? '✓' : STATIONS[id].n;
+    b.innerHTML = `${sym}<span class="tip">${LABELS[id]}</span>`;
+    b.setAttribute('aria-label', `${LABELS[id]}${S.done[id] ? ', complete' : ''}${b.disabled ? ', locked' : ''}`);
+    if(S.current === id) b.setAttribute('aria-current', 'step');
+    b.onclick = () => go(id);
+    nav.appendChild(b);
+  });
+}
+
+function render(){
+  renderWho(); renderTrack();
+  const id = S.current;
+  if(!unlocked(id)) { S.current = 'brief'; return render(); }
+  if(id === 'brief') renderBrief();
+  else if(id === 'game') renderGame();
+  else if(id === 'final') renderFinal();
+  else renderStation(id);
+}
+
+/* ---------- Briefing ---------- */
+function renderBrief(){
+  $('view').innerHTML = `
+  <article>
+    <p class="meta">Mission briefing, about 5 minutes</p>
+    <h2>Welcome, forecaster</h2>
+    <svg class="hero-svg" viewBox="0 0 780 150" role="img" aria-label="The Sun warms the ocean, water vapor rises into clouds, and a spinning hurricane forms">
+      <circle cx="70" cy="60" r="34" fill="var(--sun)"/>
+      <g stroke="var(--sun)" stroke-width="4" stroke-linecap="round">
+        <line x1="115" y1="70" x2="215" y2="110"/><line x1="112" y1="88" x2="200" y2="128"/><line x1="118" y1="52" x2="230" y2="94"/>
+      </g>
+      <rect x="0" y="122" width="780" height="28" fill="var(--ocean)" opacity=".85"/>
+      <g fill="none" stroke="var(--ocean)" stroke-width="3" stroke-linecap="round" opacity=".7">
+        <path d="M290 118 q 8 -14 0 -28 q -8 -14 0 -28"/><path d="M320 118 q 8 -14 0 -28 q -8 -14 0 -28"/><path d="M350 118 q 8 -14 0 -28 q -8 -14 0 -28"/>
+      </g>
+      <g fill="var(--card)" stroke="var(--line)" stroke-width="2">
+        <ellipse cx="440" cy="50" rx="50" ry="22"/><ellipse cx="480" cy="40" rx="40" ry="20"/>
+      </g>
+      <g transform="translate(560 -25)">
+        <g class="spin" fill="none" stroke="var(--storm)" stroke-width="7" stroke-linecap="round">
+          <path d="M100 100 m0 -14 a 14 14 0 0 1 14 14 a 40 40 0 0 1 -40 40"/>
+          <path d="M100 100 m14 0 a 14 14 0 0 1 -14 14 a 40 40 0 0 1 -40 -40"/>
+          <path d="M100 100 m0 14 a 14 14 0 0 1 -14 -14 a 40 40 0 0 1 40 -40"/>
+          <path d="M100 100 m-14 0 a 14 14 0 0 1 14 -14 a 40 40 0 0 1 40 40"/>
+        </g>
+        <circle cx="100" cy="100" r="6" fill="var(--storm)"/>
+      </g>
+    </svg>
+    <p class="mission">The National Weather Service needs new forecasters who understand how storms are born. Your job: trace the Sun’s energy as it moves through the ocean and the air, and prove you can predict when a tropical disturbance will grow into a hurricane.</p>
+    <div class="brief-grid">
+      <div><h3>5 research stations</h3>Read, try a hands-on lab, answer check questions, and write field notes. You must get every question right to move on, so read the explanations.</div>
+      <div><h3>Storm Steer game</h3>Unlocks after Station 5. Guide a real-ish tropical storm across the Atlantic and try to grow it into a major hurricane.</div>
+      <div><h3>Final challenge</h3>10 questions plus a written explanation. Then copy your report and turn it in the way your teacher tells you.</div>
+    </div>
+    <p>Total time: about 2 hours. You can stop and come back later: your work saves automatically on this Chromebook when you’re signed in with your own school account.</p>
+    <h3 style="margin-top:1.5rem">Sign in to your mission</h3>
+    <label class="field">Your name (first name and last initial)
+      <input id="nm" value="${esc(S.name)}" autocomplete="off" maxlength="40">
+    </label>
+    <label class="field">Class period (optional)
+      <input id="pd" value="${esc(S.period)}" autocomplete="off" maxlength="10">
+    </label>
+    <div class="next">
+      <button class="btn primary" id="start">${S.done.brief ? 'Continue my mission' : 'Start Station 1'}</button>
+      <p id="msg"></p>
+    </div>
+    <div class="panel">
+      <p class="small">Using a shared Chromebook account? If someone else’s name is showing, start a fresh mission.</p>
+      <button class="btn" id="resetAsk">Start a fresh mission</button>
+      <div class="inline-confirm" id="resetBox"><span>This erases all saved work on this device. Erase it?</span><button class="btn" id="resetYes">Erase and restart</button><button class="btn" id="resetNo">Keep my work</button></div>
+    </div>
+  </article>`;
+  $('start').onclick = () => {
+    const n = $('nm').value.trim();
+    if(n.length < 2){ $('msg').textContent = 'Type your name first so your report shows who did the work.'; $('nm').focus(); return; }
+    S.name = n; S.period = $('pd').value.trim(); S.done.brief = true; save();
+    const nextId = ORDER.find(id => !S.done[id] && unlocked(id)) || 's1';
+    go(nextId);
+  };
+  $('resetAsk').onclick = () => $('resetBox').classList.add('show');
+  $('resetNo').onclick = () => $('resetBox').classList.remove('show');
+  $('resetYes').onclick = () => { S = fresh(); save(); render(); };
+}
+
+/* ---------- Station page ---------- */
+function renderStation(id){
+  const st = STATIONS[id];
+  S.q[id] = S.q[id] || {};
+  const qs = st.questions.map((q, i) => `
+    <fieldset class="q" id="q${i}"><legend>${i+1}. ${q.q}</legend>
+      <div class="opts">${q.o.map((o, j) => `<button class="opt" data-q="${i}" data-o="${j}">${o}</button>`).join('')}</div>
+      <p class="fb" aria-live="polite"></p>
+    </fieldset>`).join('');
+  $('view').innerHTML = `
+  <article>
+    <p class="meta">Station ${st.n} of 5, TEKS ${st.teks}, about ${st.time}</p>
+    <h2>${st.title}</h2>
+    <p class="mission">${st.mission}</p>
+    <section class="read">${st.read}</section>
+    <section class="lab" id="lab"></section>
+    <section class="checks"><h3>Check your understanding</h3>${qs}</section>
+    <section class="note"><h3>Field notes</h3>
+      <label for="note">${st.note}</label>
+      <textarea id="note">${esc(S.notes[id]||'')}</textarea>
+      <div class="count" id="cnt"></div>
+    </section>
+    <div class="next"><button class="btn primary" id="finish">${st.n < 5 ? `Finish station and go to Station ${st.n+1}` : 'Finish station and unlock the game'}</button><p id="fmsg" aria-live="polite"></p></div>
+  </article>`;
+  LABS[st.lab]($('lab'));
+  st.questions.forEach((q, i) => paintQ(id, i));
+  document.querySelectorAll('.opt').forEach(b => b.onclick = () => answer(id, +b.dataset.q, +b.dataset.o));
+  const note = $('note');
+  const upd = () => { const n = note.value.trim().length; $('cnt').textContent = n < 40 ? `Write at least 40 characters (${n} so far).` : 'Looks good.'; };
+  note.oninput = () => { S.notes[id] = note.value; save(); upd(); };
+  upd();
+  $('finish').onclick = () => {
+    const missing = st.questions.filter((q, i) => !(S.q[id][i] && S.q[id][i].correct)).length;
+    const extra = (st.lab === 'sort' && SORT_ITEMS.some((it, i) => !S.sort[i])) ? 'Finish sorting all 10 cards in the lab. ' : '';
+    if(missing || (S.notes[id]||'').trim().length < 40 || extra){
+      $('fmsg').textContent = extra + (missing ? `Answer ${missing} more question${missing>1?'s':''} correctly. ` : '') + ((S.notes[id]||'').trim().length < 40 ? 'Your field notes need at least 40 characters.' : '');
+      return;
+    }
+    S.done[id] = true; save();
+    go(ORDER[ORDER.indexOf(id)+1]);
+  };
+}
+function answer(id, i, j){
+  const rec = S.q[id][i] = S.q[id][i] || {tries:0, correct:false, wrong:[]};
+  if(rec.correct) return;
+  rec.tries++;
+  if(j === STATIONS[id].questions[i].a) rec.correct = true; else if(!rec.wrong.includes(j)) rec.wrong.push(j);
+  save(); paintQ(id, i);
+}
+function paintQ(id, i){
+  const q = STATIONS[id].questions[i], rec = S.q[id][i], fs = $('q'+i), fb = fs.querySelector('.fb');
+  if(!rec) return;
+  fs.querySelectorAll('.opt').forEach(b => {
+    const j = +b.dataset.o;
+    b.classList.toggle('wrong', rec.wrong.includes(j));
+    b.classList.toggle('right', rec.correct && j === q.a);
+    b.disabled = rec.correct || rec.wrong.includes(j);
+  });
+  if(rec.correct){ fb.className = 'fb ok'; fb.textContent = `Correct${rec.tries===1?' on the first try':''}. ${q.why}`; }
+  else { fb.className = 'fb no'; fb.textContent = 'Not quite. Reread the station text above and try another answer.'; }
+}
+
+/* ---------- Labs ---------- */
+const LABS = {};
+
+LABS.sun = el => {
+  el.innerHTML = `<h3>Lab: Sun angle</h3>
+  <p>The yellow beam always carries the same amount of energy. Drag the slider to lower the Sun and watch where that energy lands.</p>
+  <svg class="figure" viewBox="0 0 400 230" role="img" aria-label="A beam of sunlight hitting the ground at an adjustable angle">
+    <polygon id="beam" fill="var(--sun)" opacity=".55"/>
+    <rect x="0" y="190" width="400" height="40" fill="var(--land)"/>
+    <rect id="hot" y="186" height="8" fill="var(--storm)"/>
+    <text id="spreadT" x="200" y="215" text-anchor="middle" font-size="13" fill="var(--ink)"></text>
+  </svg>
+  <label class="slider">Sun angle above the horizon: <output id="angOut"></output>
+    <input type="range" id="ang" min="15" max="90" value="90" aria-describedby="eTxt"></label>
+  <div class="meterbar"><span id="eBar"></span></div>
+  <p id="eTxt" aria-live="polite"></p>`;
+  const upd = () => {
+    const deg = +$('ang').value, t = deg * Math.PI/180, s = 80/Math.sin(t);
+    const dx = -Math.cos(t), dy = -Math.sin(t), L = 400;
+    const l = 200 - s/2, r = 200 + s/2;
+    $('beam').setAttribute('points', `${l},190 ${r},190 ${r+dx*L},${190+dy*L} ${l+dx*L},${190+dy*L}`);
+    $('hot').setAttribute('x', l); $('hot').setAttribute('width', s);
+    $('spreadT').textContent = `Energy spread over ${(s/80).toFixed(1)}× the area`;
+    const pct = Math.round(Math.sin(t)*100), lat = 90 - deg;
+    $('angOut').textContent = deg + '°';
+    $('eBar').style.width = pct + '%';
+    let place = lat <= 10 ? 'near the equator' : lat <= 23 ? 'in the tropics' : lat <= 37 ? 'about where Texas is (26°–36° N)' : lat <= 60 ? 'in the mid-latitudes, like Canada' : 'near the poles';
+    $('eTxt').textContent = `Each square meter gets about ${pct}% of full-strength energy. That’s like the noon Sun on the first day of spring ${place} (about ${lat}° latitude).`;
+  };
+  $('ang').oninput = upd; upd();
+};
+
+LABS.breeze = el => {
+  el.innerHTML = `<h3>Lab: Sea breeze and land breeze</h3>
+  <p>Switch between day and night. Watch the thermometers and the direction the air flows.</p>
+  <div class="controls"><button class="btn" id="bDay" aria-pressed="true">Day</button><button class="btn" id="bNight" aria-pressed="false">Night</button></div>
+  <svg class="figure" viewBox="0 0 400 230" role="img" aria-label="Diagram of air flowing between land and sea" id="bz">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="var(--storm)"/></marker></defs>
+    <rect id="sky" x="0" y="0" width="400" height="185" fill="var(--ocean-soft)"/>
+    <rect x="0" y="185" width="200" height="45" fill="var(--ocean)"/>
+    <rect x="200" y="180" width="200" height="50" fill="var(--land)"/>
+    <circle id="orb" cx="340" cy="30" r="16"/>
+    <g id="loop" fill="none" stroke="var(--storm)" stroke-width="3" marker-end="url(#ar)"></g>
+    <text id="tSea" x="100" y="212" text-anchor="middle" font-size="14" font-weight="700" fill="#fff"></text>
+    <text id="tLand" x="300" y="210" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)"></text>
+    <text id="lbl" x="200" y="18" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)"></text>
+  </svg>
+  <p id="bTxt" aria-live="polite"></p>`;
+  const set = day => {
+    $('bDay').setAttribute('aria-pressed', day); $('bNight').setAttribute('aria-pressed', !day);
+    $('orb').setAttribute('fill', day ? 'var(--sun)' : '#C7D0D8');
+    $('sky').setAttribute('opacity', day ? 1 : .45);
+    const paths = day
+      ? ['M70 160 L310 160','M320 150 L320 70','M310 55 L80 55','M60 70 L60 145']
+      : ['M320 160 L90 160','M70 150 L70 70','M80 55 L310 55','M330 70 L330 145'];
+    $('loop').innerHTML = paths.map(d => `<path class="flow" d="${d}"/>`).join('');
+    $('tSea').textContent = day ? 'Sea 84 °F' : 'Sea 80 °F';
+    $('tLand').textContent = day ? 'Land 97 °F' : 'Land 72 °F';
+    $('lbl').textContent = day ? 'Sea breeze' : 'Land breeze';
+    $('bTxt').textContent = day
+      ? 'Day: the land heats faster than the water. Warm air rises over the land, and cooler air from the sea flows in along the ground. This is a sea breeze.'
+      : 'Night: the land cools faster than the water. Now the air over the warmer sea rises, and cooler air from the land flows out toward the sea. This is a land breeze.';
+  };
+  $('bDay').onclick = () => set(true); $('bNight').onclick = () => set(false); set(true);
+};
+
+LABS.sort = el => {
+  el.innerHTML = `<h3>Lab: Weather or climate sort</h3>
+  <p>Decide whether each statement describes weather (short-term) or climate (long-term). Your first choice on each card is recorded.</p>
+  <div class="sortgrid" id="sg"></div><p id="sortScore" class="tag"></p>`;
+  const paint = () => {
+    $('sg').innerHTML = SORT_ITEMS.map((it, i) => {
+      const r = S.sort[i];
+      return `<div class="card ${r?'good':''}"><span class="txt">${it.t}</span>${r
+        ? `<span class="tag">${it.a === 'weather' ? 'Weather' : 'Climate'} ✓</span>`
+        : `<span><button class="btn" data-i="${i}" data-a="weather">Weather</button> <button class="btn" data-i="${i}" data-a="climate">Climate</button></span>`}
+        <span class="small" id="sf${i}" aria-live="polite"></span></div>`;
+    }).join('');
+    $('sg').querySelectorAll('button').forEach(b => b.onclick = () => {
+      const i = +b.dataset.i, it = SORT_ITEMS[i];
+      S.sortTries = S.sortTries || {};
+      if(S.sortTries[i] === undefined) S.sortTries[i] = (b.dataset.a === it.a);
+      if(b.dataset.a === it.a){ S.sort[i] = true; save(); paint(); }
+      else { save(); $('sf'+i).textContent = it.a === 'weather' ? 'Hint: is this about right now or the next few days?' : 'Hint: is this a long-term pattern or average?'; }
+    });
+    const doneN = SORT_ITEMS.filter((x, i) => S.sort[i]).length;
+    const first = Object.values(S.sortTries||{}).filter(Boolean).length;
+    $('sortScore').textContent = doneN === SORT_ITEMS.length ? `All sorted. First-try score: ${first} out of 10.` : `${doneN} of 10 sorted.`;
+  };
+  paint();
+};
+
+LABS.coriolis = el => {
+  el.innerHTML = `<h3>Lab: The Coriolis turntable</h3>
+  <p>This disk is Earth seen from above the pole. Launch a puck from the pole toward the equator. The puck moves in a straight line, but watch the mark it leaves on the spinning ground.</p>
+  <div class="cor">
+    <canvas id="cc" width="640" height="640" aria-label="Spinning disk showing the path of a launched puck"></canvas>
+    <div class="side">
+      <div class="controls">
+        <button class="btn primary" id="cLaunch">Launch puck</button>
+        <button class="btn" id="cSpin" aria-pressed="true">Earth spinning</button>
+        <button class="btn" id="cHem">Switch to Southern Hemisphere</button>
+        <button class="btn" id="cClear">Clear marks</button>
+      </div>
+      <p id="cTxt" aria-live="polite">Press “Launch puck” to begin.</p>
+    </div>
+  </div>
+  <div class="belts">
+    <h3>Lab: Map the wind belts</h3>
+    <p>This side view shows the three convection cells in the Northern Hemisphere, from the equator (left) to the North Pole (right). Use the station reading to fill in each blank.</p>
+    <svg class="figure" viewBox="0 0 420 240" role="img" aria-label="Three convection cells between the equator and the North Pole, with surface wind zones labeled A, B, and C">
+      <defs><marker id="am" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="var(--ocean)"/></marker></defs>
+      <rect x="0" y="190" width="420" height="50" fill="var(--land)" opacity=".6"/>
+      ${cell(80,110,60,70,true)}${cell(210,110,60,70,false)}${cell(340,110,60,70,true)}
+      <g font-size="12" fill="var(--ink)" text-anchor="middle">
+        <text x="20" y="207">0°</text><text x="145" y="207">30°</text><text x="275" y="207">60°</text><text x="405" y="207">90°</text>
+        <text x="80" y="30">Hadley</text><text x="210" y="30">Ferrel</text><text x="340" y="30">Polar</text>
+      </g>
+      <g font-size="16" font-weight="700" fill="var(--storm)" text-anchor="middle"><text x="80" y="230">A</text><text x="210" y="230">B</text><text x="340" y="230">C</text></g>
+    </svg>
+    <div id="beltRows"></div>
+    <div class="controls"><button class="btn primary" id="bCheck">Check my map</button><span id="bRes" class="tag" aria-live="polite"></span></div>
+  </div>`;
+
+  // Turntable
+  const cv = $('cc'), ctx = cv.getContext('2d'), R = 280, C = 320;
+  let ang = 0, spin = true, north = true, puck = null, trails = [], last = performance.now();
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function rot(x, y, a){ return [x*Math.cos(a) - y*Math.sin(a), x*Math.sin(a) + y*Math.cos(a)]; }
+  function frame(now){
+    if(!cv.isConnected) return;
+    const dt = Math.min(.05, (now - last)/1000); last = now;
+    const w = spin ? (north ? .9 : -.9) * (reduce ? .6 : 1) : 0;
+    ang += w*dt;
+    if(puck){
+      puck.t += dt; const r = 150*puck.t;
+      const ix = 0, iy = r;
+      puck.pos = [ix, iy];
+      const [dx, dy] = rot(ix, iy, -ang); puck.trail.push([dx, dy]);
+      if(r >= R){ trails.push(puck.trail); puck = null; explain(); }
+    }
+    const st = getComputedStyle(document.documentElement);
+    ctx.clearRect(0,0,640,640);
+    ctx.save(); ctx.translate(C, C);
+    ctx.beginPath(); ctx.arc(0,0,R,0,Math.PI*2); ctx.fillStyle = st.getPropertyValue('--card'); ctx.fill();
+    ctx.strokeStyle = st.getPropertyValue('--line'); ctx.lineWidth = 2;
+    for(let k=0;k<12;k++){ const [x,y] = rot(0,R,ang + k*Math.PI/6); ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(x,-y); ctx.stroke(); }
+    [90,180,R].forEach(rr => { ctx.beginPath(); ctx.arc(0,0,rr,0,Math.PI*2); ctx.stroke(); });
+    ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.strokeStyle = st.getPropertyValue('--storm');
+    const drawTrail = tr => { ctx.beginPath(); tr.forEach(([x,y],i) => { const [sx,sy] = rot(x,y,ang); i ? ctx.lineTo(sx,-sy) : ctx.moveTo(sx,-sy); }); ctx.stroke(); };
+    trails.forEach(drawTrail); if(puck) drawTrail(puck.trail);
+    if(puck){ ctx.beginPath(); ctx.arc(puck.pos[0], -puck.pos[1], 14, 0, Math.PI*2); ctx.fillStyle = st.getPropertyValue('--sun'); ctx.fill(); }
+    ctx.fillStyle = st.getPropertyValue('--ink'); ctx.font = 'bold 26px Atkinson Hyperlegible, Verdana, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(north ? 'North Pole' : 'South Pole', 0, 40);
+    ctx.font = '22px Atkinson Hyperlegible, Verdana, sans-serif'; ctx.fillText('toward equator ↑', 0, -R + 30);
+    ctx.restore();
+    requestAnimationFrame(frame);
+  }
+  function explain(){
+    if(!spin) $('cTxt').textContent = 'With Earth not spinning, the mark is a straight line. No spin, no Coriolis effect.';
+    else $('cTxt').textContent = north
+      ? 'The puck flew straight, but the ground turned under it, so its path across Earth curves to the RIGHT. That’s the Coriolis effect in the Northern Hemisphere.'
+      : 'Seen from above the South Pole, Earth spins the other way, so the path curves to the LEFT. That’s the Coriolis effect in the Southern Hemisphere.';
+  }
+  $('cLaunch').onclick = () => { if(!puck){ puck = {t:0, trail:[], pos:[0,0]}; $('cTxt').textContent = 'Watch the mark…'; } };
+  $('cSpin').onclick = () => { spin = !spin; $('cSpin').setAttribute('aria-pressed', spin); $('cSpin').textContent = spin ? 'Earth spinning' : 'Earth stopped'; };
+  $('cHem').onclick = () => { north = !north; trails = []; $('cHem').textContent = north ? 'Switch to Southern Hemisphere' : 'Switch to Northern Hemisphere'; $('cTxt').textContent = 'Hemisphere switched. Launch again.'; };
+  $('cClear').onclick = () => { trails = []; };
+  requestAnimationFrame(frame);
+
+  // Belts
+  const winds = ['Trade winds','Prevailing westerlies','Polar easterlies'];
+  const air = ['Rises, making low pressure and rain','Sinks, making high pressure and dry weather'];
+  const rows = [
+    {l:'Surface wind at A (0°–30° N)', o:winds, a:0},
+    {l:'Surface wind at B (30°–60° N)', o:winds, a:1},
+    {l:'Surface wind at C (60°–90° N)', o:winds, a:2},
+    {l:'At the equator (0°), air…', o:air, a:0},
+    {l:'At about 30° N, air…', o:air, a:1}
+  ];
+  $('beltRows').innerHTML = rows.map((r,i) => `<div class="row"><span class="l" id="bl${i}">${r.l}</span><select id="bs${i}" aria-labelledby="bl${i}"><option value="">Choose…</option>${r.o.map((o,j)=>`<option value="${j}">${o}</option>`).join('')}</select><span class="mark" id="bm${i}"></span></div>`).join('');
+  $('bCheck').onclick = () => {
+    let n = 0;
+    rows.forEach((r,i) => { const v = $('bs'+i).value; const ok = v !== '' && +v === r.a; if(ok) n++; $('bm'+i).textContent = v === '' ? '' : ok ? '✓' : '✗ try again'; $('bm'+i).style.color = ok ? 'var(--ok)' : 'var(--storm)'; });
+    if(S.belts === null) { S.belts = n; save(); }
+    $('bRes').textContent = n === 5 ? 'Your wind map is correct!' : `${n} of 5 correct.`;
+  };
+};
+function cell(cx, cy, rx, ry, cw){
+  const s = cw ? 1 : 0;
+  const pts = cw
+    ? `M${cx} ${cy+ry} A${rx} ${ry} 0 0 ${s} ${cx-rx} ${cy} A${rx} ${ry} 0 0 ${s} ${cx} ${cy-ry} A${rx} ${ry} 0 0 ${s} ${cx+rx} ${cy} A${rx} ${ry} 0 0 ${s} ${cx} ${cy+ry}`
+    : `M${cx} ${cy+ry} A${rx} ${ry} 0 0 ${s} ${cx+rx} ${cy} A${rx} ${ry} 0 0 ${s} ${cx} ${cy-ry} A${rx} ${ry} 0 0 ${s} ${cx-rx} ${cy} A${rx} ${ry} 0 0 ${s} ${cx} ${cy+ry}`;
+  return `<path d="${pts}" fill="none" stroke="var(--ocean)" stroke-width="3" marker-mid="url(#am)"/>`;
+}
+
+LABS.builder = el => {
+  el.innerHTML = `<h3>Lab: Hurricane recipe tester</h3>
+  <p>A tropical disturbance is sitting over the ocean. Set the conditions, then run the forecast to see if it grows into a hurricane. Try removing one ingredient at a time.</p>
+  <label class="slider">Sea surface temperature: <output id="oT"></output><input type="range" id="iT" min="20" max="32" step=".5" value="24"></label>
+  <label class="slider">Humidity (moisture in the air): <output id="oH"></output><input type="range" id="iH" min="20" max="100" step="5" value="40"></label>
+  <label class="slider">Latitude (distance from the equator): <output id="oL"></output><input type="range" id="iL" min="0" max="30" value="2"></label>
+  <div class="controls">
+    <span>Wind shear:</span><button class="btn" id="shLow" aria-pressed="false">Low</button><button class="btn" id="shHigh" aria-pressed="true">High</button>
+  </div>
+  <label class="controls"><input type="checkbox" id="iD" checked> Starting disturbance (cluster of thunderstorms) present</label>
+  <div class="controls"><button class="btn primary" id="run">Run forecast</button></div>
+  <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center">
+    <svg viewBox="0 0 200 200" width="170" height="170" role="img" aria-label="Storm strength picture" style="background:var(--ocean-soft);border-radius:50%">
+      <g id="stormG" style="transform-origin:100px 100px;transition:transform .8s">
+        <g class="spin" fill="none" stroke="var(--storm)" stroke-width="10" stroke-linecap="round">
+          <path d="M100 100 m0 -16 a 16 16 0 0 1 16 16 a 50 50 0 0 1 -50 50"/>
+          <path d="M100 100 m16 0 a 16 16 0 0 1 -16 16 a 50 50 0 0 1 -50 -50"/>
+          <path d="M100 100 m0 16 a 16 16 0 0 1 -16 -16 a 50 50 0 0 1 50 -50"/>
+          <path d="M100 100 m-16 0 a 16 16 0 0 1 16 -16 a 50 50 0 0 1 50 50"/>
+        </g>
+        <circle cx="100" cy="100" r="7" fill="var(--ocean-soft)" stroke="var(--storm)" stroke-width="3"/>
+      </g>
+    </svg>
+    <div id="fc" aria-live="polite" style="flex:1 1 260px"><p>Run the forecast to see what happens.</p></div>
+  </div>`;
+  let shear = 'high';
+  const upd = () => {
+    const t = +$('iT').value; $('oT').textContent = `${t} °C (${Math.round(t*9/5+32)} °F)`;
+    $('oH').textContent = $('iH').value + '%'; $('oL').textContent = $('iL').value + '° N';
+  };
+  ['iT','iH','iL'].forEach(i => $(i).oninput = upd); upd();
+  const setSh = v => { shear = v; $('shLow').setAttribute('aria-pressed', v==='low'); $('shHigh').setAttribute('aria-pressed', v==='high'); };
+  $('shLow').onclick = () => setSh('low'); $('shHigh').onclick = () => setSh('high');
+  $('stormG').style.transform = 'scale(.35)';
+  $('run').onclick = () => {
+    const t = +$('iT').value, h = +$('iH').value, lat = +$('iL').value, d = $('iD').checked;
+    const checks = [
+      [t >= 26.5, 'Warm water', t >= 26.5 ? 'Warm enough to fuel the storm.' : 'Water is below 26.5 °C, so too little evaporation and heat.'],
+      [h >= 60, 'Moist air', h >= 60 ? 'Plenty of water vapor to condense and release heat.' : 'Air is too dry; dry air chokes off cloud growth.'],
+      [shear === 'low', 'Low wind shear', shear === 'low' ? 'The storm can stack up tall and organized.' : 'Strong shear tilts and tears the storm apart.'],
+      [lat >= 5, 'Coriolis spin', lat >= 5 ? 'Far enough from the equator to spin.' : 'Too close to the equator; the Coriolis effect is too weak to start rotation.'],
+      [d, 'Starting disturbance', d ? 'Thunderstorms are there to get things started.' : 'Nothing to start the storm, even if conditions are good.']
+    ];
+    const ok = checks.every(c => c[0]);
+    let cat = '';
+    if(ok){ cat = t >= 31 ? 'a Category 5' : t >= 30 ? 'a Category 4' : t >= 29 ? 'a Category 3 (major)' : t >= 28 ? 'a Category 2' : 'a Category 1'; }
+    $('stormG').style.transform = ok ? `scale(${.6 + (t-26.5)*.08})` : 'scale(.3)';
+    $('fc').innerHTML = `<p><strong>${ok ? `Forecast: the disturbance grows into ${cat} hurricane.` : 'Forecast: the disturbance fizzles out.'}</strong></p>
+      <ul class="ingredients">${checks.map(c => `<li>${c[0]?'✓':'✗'} <strong>${c[1]}:</strong> ${c[2]}</li>`).join('')}</ul>
+      ${ok ? '<p class="small">Warmer water means more fuel, so this model makes stronger storms over hotter water. Real storms are more complicated.</p>' : ''}`;
+  };
+};
+
+/* ---------- Game ---------- */
+const ROUNDS = [
+  {target:39, goal:'Grow into a tropical storm (39 mph) before the storm dies or hits land.'},
+  {target:74, goal:'Become a hurricane (74 mph or more) before landfall.'},
+  {target:111, goal:'Become a major hurricane, Category 3 (111 mph or more). Avoid wind shear!'}
+];
+function category(w){ return w < 39 ? 'Tropical depression' : w < 74 ? 'Tropical storm' : w < 96 ? 'Category 1' : w < 111 ? 'Category 2' : w < 130 ? 'Category 3' : w < 157 ? 'Category 4' : 'Category 5'; }
+
+function renderGame(){
+  $('view').innerHTML = `
+  <article>
+    <p class="meta">Embedded game, TEKS 8.10A, 8.10B, 8.10C, about 25 minutes</p>
+    <h2>Storm Steer</h2>
+    <p class="mission">You control a tropical disturbance that just rolled off the coast of Africa. The trade winds push it west and the Coriolis effect nudges it north. Your job: steer it through the conditions it needs to grow.</p>
+    <div class="callout"><strong>How to play</strong>Use the ↑ and ↓ arrow keys (or W and S, or the buttons under the map) to steer north and south. Orange and red water is warm fuel; blue water is too cool. Grab moisture drops for a boost. Avoid the striped wind shear zones, the dusty dry air near Africa, and land. Stay above 5° latitude or your storm can’t spin.</div>
+    <div class="gamebox">
+      <div class="hud">
+        <div><small>Wind speed</small><b id="hW">0 mph</b></div>
+        <div><small>Strength</small><b id="hC">–</b></div>
+        <div><small>Water under storm</small><b id="hT">–</b></div>
+        <div><small>Latitude</small><b id="hL">–</b></div>
+      </div>
+      <canvas id="gcanvas" width="800" height="450" tabindex="0" aria-label="Storm Steer game map of the Atlantic Ocean"></canvas>
+      <p id="status" aria-live="polite"></p>
+      <div class="pad"><button class="btn" id="pUp" aria-label="Steer north">▲ North</button><button class="btn" id="pDn" aria-label="Steer south">▼ South</button></div>
+      <div class="panel" id="rpanel"></div>
+    </div>
+    <section class="note"><h3>Forecaster debrief</h3>
+      <label for="gnote">What strategy made your storm grow the most? Explain it using at least two hurricane ingredients from Station 5.</label>
+      <textarea id="gnote">${esc(S.gameNote||'')}</textarea><div class="count" id="gcnt"></div>
+    </section>
+    <div class="next"><button class="btn primary" id="gfinish">Go to the final challenge</button><p id="gmsg" aria-live="polite"></p></div>
+  </article>`;
+  const note = $('gnote');
+  const upd = () => { const n = note.value.trim().length; $('gcnt').textContent = n < 40 ? `Write at least 40 characters (${n} so far).` : 'Looks good.'; };
+  note.oninput = () => { S.gameNote = note.value; save(); upd(); }; upd();
+  $('gfinish').onclick = () => {
+    const played = Object.keys(S.game.rounds).length;
+    if(played < 3 || (S.gameNote||'').trim().length < 40){
+      $('gmsg').textContent = (played < 3 ? `Play all 3 rounds first (${played} of 3 played). ` : '') + ((S.gameNote||'').trim().length < 40 ? 'Your debrief needs at least 40 characters.' : '');
+      return;
+    }
+    S.done.game = true; save(); go('final');
+  };
+  Game.init();
+}
+
+const Game = (() => {
+  const W = 800, H = 450, LATMAX = 40;
+  let cv, ctx, bg, st, round = 0, raf = null, keys = {up:false, dn:false}, last = 0;
+  const y2 = lat => H - lat/LATMAX*H;
+  const isLand = (x, lat) => (x < 70 && lat > 7) || (lat > 30.5 && x < 430) || (x > 765 && lat > 5) ||
+    (Math.hypot((x-300)/38, (lat-20)/1.2) < 1) || (Math.hypot((x-380)/26, (lat-18.5)/1) < 1);
+  const inGulf = (x, lat) => x > 70 && x < 430 && lat > 18 && lat < 30.5;
+  function sst(x, lat){
+    let s = 29.6 - Math.max(0, lat-16)*0.55;
+    if(inGulf(x, lat)) s += 1.4;
+    st.eddies.forEach(e => { const d = Math.hypot(x-e.x, y2(lat)-y2(e.lat)); if(d < e.r) s -= 3.2*(1-d/e.r); });
+    return s;
+  }
+  function color(s){
+    const t = Math.max(0, Math.min(1, (s-21)/10));
+    const stops = [[30,90,170],[70,160,200],[240,200,90],[235,120,40],[200,40,50]];
+    const f = t*(stops.length-1), i = Math.min(stops.length-2, Math.floor(f)), k = f - i;
+    const c = stops[i].map((v,j) => Math.round(v + (stops[i+1][j]-v)*k));
+    return `rgb(${c})`;
+  }
+  const rnd = (a,b) => a + Math.random()*(b-a);
+  function setup(r){
+    st = {x:735, lat:12, wind:25 + (S.game.boost||0), max:0, rot:0, t:0, trail:[], tt:0, over:false, msg:'',
+      eddies: Array.from({length:1+r}, () => ({x:rnd(160,640), lat:rnd(9,21), r:rnd(40,62)})),
+      shear: Array.from({length:1+r*1.5|0}, () => ({x:rnd(130,600), lat:rnd(10,24), w:rnd(80,130), h:rnd(3.5,5.5), vx:rnd(-6,6)})),
+      drops: Array.from({length:12}, () => ({x:rnd(110,700), lat:rnd(7,24), got:false}))
+    };
+    st.drops = st.drops.filter(d => !isLand(d.x, d.lat));
+    S.game.boost = 0; save();
+    bg = document.createElement('canvas'); bg.width = W; bg.height = H; const b = bg.getContext('2d');
+    for(let x=0; x<W; x+=8) for(let y=0; y<H; y+=8){
+      const lat = (H-y-4)/H*LATMAX;
+      b.fillStyle = isLand(x+4, lat) ? '#B7A27A' : color(sst(x+4, lat)); b.fillRect(x, y, 8, 8);
+    }
+    b.fillStyle = 'rgba(210,170,110,.28)'; b.fillRect(560, y2(30), 205, y2(19)-y2(30));
+    b.strokeStyle = 'rgba(255,255,255,.75)'; b.setLineDash([6,6]); b.lineWidth = 1.5;
+    [[5,'5° N: below this, too little Coriolis to spin'],[0,'Equator']].forEach(([lat,t]) => { b.beginPath(); b.moveTo(70,y2(lat)); b.lineTo(W,y2(lat)); b.stroke(); b.fillStyle='#fff'; b.font='13px Atkinson Hyperlegible, Verdana, sans-serif'; b.fillText(t, 80, y2(lat)-5); });
+    b.setLineDash([]);
+    b.fillStyle = '#1d2b20'; b.font = 'bold 15px Bricolage Grotesque, Verdana, sans-serif';
+    b.fillText('North America', 140, y2(35)); b.fillText('Texas', 95, y2(31.5)); b.fillText('Mexico', 6, y2(22));
+    b.save(); b.translate(790, y2(20)); b.rotate(-Math.PI/2); b.fillText('Africa', 0, 0); b.restore();
+    b.fillStyle = '#fff'; b.font = '13px Atkinson Hyperlegible, Verdana, sans-serif';
+    b.fillText('Gulf (extra warm)', 180, y2(25)); b.fillText('Dry dusty air', 600, y2(27)); b.fillText('Caribbean islands', 255, y2(17));
+    b.fillText('Cooler water to the north', 470, y2(29));
+  }
+  function draw(){
+    ctx.drawImage(bg, 0, 0);
+    st.shear.forEach(s => {
+      const y = y2(s.lat + s.h/2), h = y2(s.lat - s.h/2) - y;
+      ctx.save(); ctx.beginPath(); ctx.rect(s.x, y, s.w, h); ctx.clip();
+      ctx.fillStyle = 'rgba(80,20,60,.35)'; ctx.fillRect(s.x, y, s.w, h);
+      ctx.strokeStyle = 'rgba(255,255,255,.7)'; ctx.lineWidth = 3;
+      for(let k=-h; k<s.w; k+=14){ ctx.beginPath(); ctx.moveTo(s.x+k, y+h); ctx.lineTo(s.x+k+h, y); ctx.stroke(); }
+      ctx.restore(); ctx.fillStyle = '#fff'; ctx.font = 'bold 12px Atkinson Hyperlegible, Verdana, sans-serif'; ctx.fillText('wind shear', s.x+4, y-4);
+    });
+    st.drops.forEach(d => { if(d.got) return; const y = y2(d.lat);
+      ctx.fillStyle = '#E6F7FF'; ctx.strokeStyle = '#0D5C7D'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(d.x, y-10); ctx.quadraticCurveTo(d.x+8, y+2, d.x, y+6); ctx.quadraticCurveTo(d.x-8, y+2, d.x, y-10); ctx.fill(); ctx.stroke(); });
+    ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 2; ctx.setLineDash([3,5]);
+    ctx.beginPath(); st.trail.forEach(([x,l],i) => i ? ctx.lineTo(x, y2(l)) : ctx.moveTo(x, y2(l))); ctx.stroke(); ctx.setLineDash([]);
+    const x = st.x, y = y2(st.lat), r = 12 + st.wind*0.16;
+    ctx.save(); ctx.translate(x, y);
+    ctx.fillStyle = 'rgba(255,255,255,.18)'; ctx.beginPath(); ctx.arc(0,0,r*1.1,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    for(let k=0;k<3;k++){ ctx.beginPath(); for(let t=0;t<=1.001;t+=.05){ const a = st.rot + k*2*Math.PI/3 + t*3.4; const rr = r*t; const px = Math.cos(a)*rr, py = Math.sin(a)*rr; t ? ctx.lineTo(px,py) : ctx.moveTo(px,py); } ctx.stroke(); }
+    if(st.wind >= 74){ ctx.fillStyle = '#0a3a52'; ctx.beginPath(); ctx.arc(0,0,4+st.wind*.02,0,Math.PI*2); ctx.fill(); }
+    ctx.restore();
+  }
+  function hud(s){
+    $('hW').textContent = Math.round(st.wind) + ' mph'; $('hC').textContent = category(st.wind);
+    $('hT').textContent = isLand(st.x, st.lat) ? 'Over land' : `${s.toFixed(1)} °C`;
+    $('hL').textContent = st.lat.toFixed(1) + '° N';
+    $('status').textContent = st.msg;
+  }
+  function step(now){
+    if(!cv.isConnected){ raf = null; return; }
+    const dt = Math.min(.05, (now-last)/1000); last = now;
+    st.t += dt;
+    if(keys.up) st.lat += 2.6*dt; if(keys.dn) st.lat -= 2.6*dt;
+    st.lat += (0.15 + st.lat*0.012)*dt;
+    const vx = st.lat < 26 ? -15 : st.lat < 30 ? -5 : 9;
+    st.x += vx*dt; st.rot -= dt*(1.2 + st.wind/35);
+    st.shear.forEach(s => { s.x += s.vx*dt; if(s.x < 90 || s.x + s.w > 760) s.vx *= -1; });
+    const s = sst(st.x, st.lat);
+    let g, msg;
+    const land = isLand(st.x, st.lat);
+    const inShear = st.shear.some(z => st.x > z.x && st.x < z.x+z.w && Math.abs(st.lat - z.lat) < z.h/2);
+    const dry = st.x > 560 && st.x < 765 && st.lat > 19 && st.lat < 30;
+    if(land){ g = -20; msg = 'Over land: cut off from warm water, the storm is losing its fuel!'; }
+    else {
+      g = (s - 26.5)*1.25;
+      msg = s >= 26.5 ? 'Warm water: evaporation and condensation are feeding the storm.' : 'Water is below 26.5 °C: not enough fuel. The storm is weakening.';
+      if(st.lat < 5){ g = Math.min(g, 0) - 7; msg = 'Too close to the equator: the Coriolis effect is too weak to keep it spinning!'; }
+      if(dry){ g -= 5; msg = 'Dry, dusty air is choking off cloud growth.'; }
+      if(inShear){ g -= 15; msg = 'Wind shear is tilting and tearing the storm apart!'; }
+    }
+    st.wind = Math.max(0, Math.min(175, st.wind + g*dt));
+    st.drops.forEach(d => { if(!d.got && Math.hypot(d.x-st.x, y2(d.lat)-y2(st.lat)) < 20){ d.got = true; st.wind += 5; msg = 'Moisture boost! More water vapor means more energy. +5 mph'; } });
+    st.msg = msg; st.max = Math.max(st.max, st.wind);
+    st.tt += dt; if(st.tt > .3){ st.tt = 0; st.trail.push([st.x, st.lat]); }
+    st.lat = Math.max(0, Math.min(LATMAX, st.lat));
+    draw(); hud(s);
+    let end = null;
+    if(st.wind < 12 && st.t > 3) end = 'Your storm fell apart and dissipated.';
+    else if(land && st.x < 70) end = `Landfall! The storm came ashore at ${Math.round(st.wind)} mph.`;
+    else if(land && st.lat > 30.5) end = `Landfall on the U.S. coast at ${Math.round(st.wind)} mph.`;
+    else if(st.x > 790 || st.lat >= LATMAX - .2) end = 'The storm drifted out over cold northern water and lost its tropical fuel.';
+    else if(st.t > 75) end = 'Time’s up! The forecast period ended.';
+    if(end){ finish(end); return; }
+    raf = requestAnimationFrame(step);
+  }
+  function finish(msg){
+    raf = null; keys.up = keys.dn = false;
+    const R = ROUNDS[round], peak = Math.round(st.max), success = peak >= R.target;
+    const prev = S.game.rounds[round];
+    if(!prev || peak > prev.peak) S.game.rounds[round] = {peak, success: success || (prev && prev.success)};
+    save();
+    const q = GAME_CHECKS[(round + Object.keys(S.game.rounds).length) % GAME_CHECKS.length];
+    $('rpanel').innerHTML = `<h3>${success ? 'Mission accomplished!' : 'Mission not reached'}</h3>
+      <p>${msg} Peak strength: <strong>${peak} mph (${category(peak)})</strong>. Goal was ${R.target} mph.</p>
+      <p><strong>Forecaster check:</strong> ${q.q} Answer correctly to give your next storm a 10 mph head start.</p>
+      <div class="opts" id="gq">${q.o.map((o,j)=>`<button class="opt" data-j="${j}">${o}</button>`).join('')}</div>
+      <p class="fb" id="gqf" aria-live="polite"></p>
+      <div class="controls" id="gnext"></div>`;
+    $('gq').querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      const j = +b.dataset.j; $('gq').querySelectorAll('.opt').forEach(x => x.disabled = true);
+      if(j === q.a){ b.classList.add('right'); S.game.boost = 10; save(); $('gqf').className = 'fb ok'; $('gqf').textContent = 'Correct! Next storm starts 10 mph stronger.'; }
+      else { b.classList.add('wrong'); $('gq').querySelectorAll('.opt')[q.a].classList.add('right'); $('gqf').className = 'fb no'; $('gqf').textContent = 'Not quite. The correct answer is highlighted.'; }
+    });
+    panelButtons();
+  }
+  function panelButtons(){
+    const box = $('gnext') || $('rpanel');
+    const html = ROUNDS.map((R,i) => {
+      const unlockedR = i === 0 || S.game.rounds[i-1];
+      const rec = S.game.rounds[i];
+      return `<button class="btn ${!rec && unlockedR ? 'primary':''}" data-r="${i}" ${unlockedR?'':'disabled'}>${rec ? 'Replay' : 'Play'} round ${i+1}</button>`;
+    }).join('');
+    const table = `<div class="tablewrap"><table class="results"><tr><th>Round</th><th>Goal</th><th>Best peak</th><th>Result</th></tr>${ROUNDS.map((R,i)=>{const r=S.game.rounds[i];return `<tr><td>${i+1}</td><td>${R.target} mph</td><td>${r?r.peak+' mph':'–'}</td><td>${r?(r.success?'✓ Reached':'Not yet'):'–'}</td></tr>`;}).join('')}</table></div>`;
+    if($('gnext')) { $('gnext').innerHTML = html; $('rpanel').insertAdjacentHTML('beforeend', table); }
+    else $('rpanel').innerHTML = `<h3>Choose a round</h3>${table}<div class="controls">${html}</div>`;
+    $('rpanel').querySelectorAll('[data-r]').forEach(b => b.onclick = () => start(+b.dataset.r));
+  }
+  function start(r){
+    round = r; setup(r);
+    $('rpanel').innerHTML = `<h3>Round ${r+1} of 3</h3><p>${ROUNDS[r].goal}${st.wind > 25 ? ' Your storm starts with a 10 mph head start.' : ''}</p><button class="btn" id="gquit">End round early</button>`;
+    $('gquit').onclick = () => { if(raf){ cancelAnimationFrame(raf); finish('You ended the round early.'); } };
+    cv.focus({preventScroll:true});
+    last = performance.now(); if(raf) cancelAnimationFrame(raf); raf = requestAnimationFrame(step);
+  }
+  function init(){
+    cv = $('gcanvas'); ctx = cv.getContext('2d'); setup(0); draw(); hud(sst(st.x, st.lat));
+    $('status').textContent = 'Choose a round to begin.';
+    panelButtons();
+    const hold = (id, k) => { const b = $(id);
+      b.onpointerdown = e => { e.preventDefault(); keys[k] = true; };
+      ['pointerup','pointerleave','pointercancel'].forEach(ev => b.addEventListener(ev, () => keys[k] = false)); };
+    hold('pUp','up'); hold('pDn','dn');
+  }
+  const key = (e, v) => {
+    if(!cv || !cv.isConnected || !raf) return;
+    const k = e.key.toLowerCase();
+    if(k === 'arrowup' || k === 'w'){ keys.up = v; e.preventDefault(); }
+    if(k === 'arrowdown' || k === 's'){ keys.dn = v; e.preventDefault(); }
+  };
+  window.addEventListener('keydown', e => key(e, true));
+  window.addEventListener('keyup', e => key(e, false));
+  return {init};
+})();
+
+/* ---------- Final ---------- */
+function renderFinal(){
+  const f = S.final;
+  $('view').innerHTML = `
+  <article>
+    <p class="meta">Final challenge, all TEKS, about 20 minutes</p>
+    <h2>Forecaster certification</h2>
+    <p class="mission">Show what you know. You get one try on each question, so think it through before you submit.</p>
+    <section id="fq">${FINAL_QS.map((q,i) => `
+      <fieldset class="q"><legend>${i+1}. ${q.q}</legend>
+        <div class="opts">${q.o.map((o,j) => `<button class="opt" data-i="${i}" data-j="${j}" aria-pressed="${f.ans[i]===j}">${o}</button>`).join('')}</div>
+        <p class="fb" id="ff${i}"></p>
+      </fieldset>`).join('')}</section>
+    <div class="next"><button class="btn primary" id="fsub">Submit my answers</button><p id="fsm" aria-live="polite"></p></div>
+    <section class="note" id="cerBox"></section>
+    <section id="rep"></section>
+  </article>`;
+  const paint = () => {
+    FINAL_QS.forEach((q,i) => {
+      document.querySelectorAll(`.opt[data-i="${i}"]`).forEach(b => {
+        const j = +b.dataset.j, picked = f.ans[i] === j;
+        b.setAttribute('aria-pressed', picked);
+        b.style.borderColor = picked && !f.submitted ? 'var(--ocean)' : '';
+        b.style.background = picked && !f.submitted ? 'var(--ocean-soft)' : '';
+        if(f.submitted){ b.disabled = true; b.classList.toggle('right', j === q.a); b.classList.toggle('wrong', picked && j !== q.a); }
+      });
+      if(f.submitted){ const ok = f.ans[i] === q.a; $('ff'+i).className = 'fb ' + (ok?'ok':'no'); $('ff'+i).textContent = ok ? 'Correct.' : 'Incorrect. The correct answer is highlighted in green.'; }
+    });
+    if(f.submitted){ $('fsub').style.display = 'none'; $('fsm').style.color = 'var(--ok)'; $('fsm').textContent = `Score: ${finalScore()} out of 10.`; showCER(); }
+  };
+  document.querySelectorAll('#fq .opt').forEach(b => b.onclick = () => { if(f.submitted) return; f.ans[+b.dataset.i] = +b.dataset.j; save(); paint(); });
+  $('fsub').onclick = () => {
+    const left = FINAL_QS.filter((q,i) => f.ans[i] === undefined).length;
+    if(left){ $('fsm').textContent = `Answer ${left} more question${left>1?'s':''} before submitting.`; return; }
+    f.submitted = true; save(); paint();
+  };
+  paint();
+}
+function finalScore(){ return FINAL_QS.filter((q,i) => S.final.ans[i] === q.a).length; }
+function showCER(){
+  $('cerBox').innerHTML = `<h3>Written explanation (claim, evidence, reasoning)</h3>
+    <label for="cer">In 2017, Hurricane Harvey formed over warm tropical water, strengthened to Category 4, and dumped record rain on southeast Texas. Explain how energy from the <strong>Sun</strong>, the <strong>ocean</strong>, and the <strong>atmosphere</strong> worked together to build a storm like Harvey. Then explain why Harvey weakened after it moved inland. Include at least one global wind or the Coriolis effect in your answer.</label>
+    <textarea id="cer" style="min-height:200px">${esc(S.cer||'')}</textarea><div class="count" id="ccnt"></div>
+    <div class="next"><button class="btn primary" id="mkrep">Finish and build my report</button><p id="rmsg" aria-live="polite"></p></div>`;
+  const t = $('cer'); const upd = () => { const n = t.value.trim().length; $('ccnt').textContent = n < 200 ? `Write at least 200 characters (${n} so far).` : 'Looks good.'; };
+  t.oninput = () => { S.cer = t.value; save(); upd(); }; upd();
+  $('mkrep').onclick = () => { if((S.cer||'').trim().length < 200){ $('rmsg').textContent = 'Your explanation needs at least 200 characters.'; return; } S.done.final = true; save(); renderTrack(); showReport(); };
+  if(S.done.final) showReport();
+}
+function buildReport(){
+  let firstTry = 0, total = 0;
+  ['s1','s2','s3','s4','s5'].forEach(id => STATIONS[id].questions.forEach((q,i) => { total++; const r = (S.q[id]||{})[i]; if(r && r.correct && r.tries === 1) firstTry++; }));
+  const sortFirst = Object.values(S.sortTries||{}).filter(Boolean).length;
+  const lines = [
+    'STORM ENGINE WEBQUEST REPORT (TEKS 8.10A, 8.10B, 8.10C)',
+    `Student: ${S.name}${S.period ? '   Period: ' + S.period : ''}`,
+    `Completed: ${new Date().toLocaleString()}`,
+    '',
+    `Final challenge: ${finalScore()} / 10`,
+    `Station check questions correct on first try: ${firstTry} / ${total}`,
+    `Weather vs. climate sort, first try: ${sortFirst} / 10`,
+    `Wind belt map, first check: ${S.belts === null ? 'not checked' : S.belts + ' / 5'}`,
+    `Storm Steer best peaks: ${ROUNDS.map((R,i) => { const r = S.game.rounds[i]; return `Round ${i+1}: ${r ? r.peak + ' mph' + (r.success ? ' (goal met)' : '') : '–'}`; }).join(';  ')}`,
+    '',
+    'FIELD NOTES'
+  ];
+  ['s1','s2','s3','s4','s5'].forEach(id => { lines.push(`Station ${STATIONS[id].n}: ${STATIONS[id].note}`); lines.push('  ' + (S.notes[id]||'').trim()); lines.push(''); });
+  lines.push('Game debrief: ' + (S.gameNote||'').trim(), '', 'WRITTEN EXPLANATION (CER)', (S.cer||'').trim());
+  return lines.join('\n');
+}
+function showReport(){
+  const txt = buildReport();
+  $('rep').innerHTML = `<div class="report">
+    <h3>Mission complete, Forecaster ${esc(S.name)}!</h3>
+    <p class="score">${finalScore()} / 10</p>
+    <p>Copy your report and turn it in the way your teacher tells you (for example, paste it into your Google Classroom assignment).</p>
+    <p><strong>Step 1:</strong> Save your work.</p>
+    <div class="controls"><button class="btn primary" id="dl">Download my work</button><button class="btn" id="cp">Copy my report</button><span id="cpm" class="tag" aria-live="polite"></span></div>
+    <p><strong>Step 2:</strong> After your work is downloaded or turned in, clear this Chromebook for the next student.</p>
+    <div class="controls"><button class="btn" id="rsAsk">Reset for the next class</button></div>
+    <div class="inline-confirm" id="rsBox"><span id="rsWarn"></span><button class="btn" id="rsYes">Erase my work and reset</button><button class="btn" id="rsNo">Not yet</button></div>
+    <pre id="rtxt" tabindex="0">${esc(txt)}</pre>
+    <textarea id="rta" style="position:absolute;left:-9999px" aria-hidden="true">${esc(txt)}</textarea>
+  </div>`;
+  let saved = false;
+  const fname = 'Storm Engine - ' + (S.name || 'student').replace(/[^\w\- ]+/g, '').trim() + (S.period ? ' - Period ' + S.period.replace(/[^\w\- ]+/g, '') : '') + '.txt';
+  $('dl').onclick = async () => {
+    const dl = await dlReady;
+    if(dl){
+      try { await dl.save({filename: fname, data: txt}); saved = true; $('cpm').textContent = 'Downloaded! Find it in your Downloads folder.'; }
+      catch(e){
+        if(e && e.code === 'declined') $('cpm').textContent = 'Download canceled. Press the button again when you’re ready.';
+        else if(e && e.code === 'rate_limited') $('cpm').textContent = 'A download box is already open. Finish that one first.';
+        else $('cpm').textContent = 'Downloading isn’t available here. Use “Copy my report” and paste it into your assignment.';
+      }
+      return;
+    }
+    try {
+      const url = URL.createObjectURL(new Blob([txt], {type:'text/plain'}));
+      const a = document.createElement('a'); a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      saved = true; $('cpm').textContent = 'Downloaded! Find it in your Downloads folder.';
+    } catch(e){ $('cpm').textContent = 'Downloading isn’t available here. Use “Copy my report” instead.'; }
+  };
+  $('rsAsk').onclick = () => {
+    $('rsWarn').textContent = saved ? 'This erases all of your work from this Chromebook. Ready?' : 'You haven’t downloaded or copied your work yet! Resetting erases it for good. Reset anyway?';
+    $('rsBox').classList.add('show');
+  };
+  $('rsNo').onclick = () => $('rsBox').classList.remove('show');
+  $('rsYes').onclick = () => { S = fresh(); save(); render(); window.scrollTo({top:0}); };
+  $('cp').onclick = async () => {
+    try { await navigator.clipboard.writeText(txt); saved = true; $('cpm').textContent = 'Copied! Now paste it into your assignment.'; }
+    catch(e){
+      const ta = $('rta'); ta.select();
+      try { document.execCommand('copy'); saved = true; $('cpm').textContent = 'Copied! Now paste it into your assignment.'; }
+      catch(e2){ $('cpm').textContent = 'Copy is blocked here. Select the report text below and press Ctrl+C.'; }
+    }
+  };
+}
+
+render();
+</script>
+</body>
+</html>
